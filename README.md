@@ -14,3 +14,9 @@ A very handy League of Legends Discord Bot that monitors a list of summoners and
 
 > Multisearch feature (copy and paste the lobby join messages)
 ![cmdline](https://i.imgur.com/6pGBliH.png)
+
+# Instructions
+
+- Edit the first few lines to put in the list of summoners and your Riot API key.
+- Edit the last line to add in your Discord Bot token
+- Run the .py
