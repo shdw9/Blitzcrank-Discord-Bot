@@ -1,4 +1,4 @@
-# shdwbot
+# shdwbot (League of Legends tool)
 A very handy League of Legends Discord Bot that monitors a list of summoners and more (WIP)
 
 # Requirements
