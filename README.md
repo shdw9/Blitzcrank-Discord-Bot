@@ -31,6 +31,7 @@ A very handy League of Legends Discord Bot that monitors a list of summoners and
 
 # Instructions
 
+- Install the required libraries, one of them is https://github.com/meraki-analytics/role-identification
 - Edit the first few lines to put in the list of summoners and your Riot API key.
 - Edit the last line to add in your Discord Bot token
 - Run the .py
