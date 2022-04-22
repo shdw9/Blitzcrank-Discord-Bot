@@ -18,7 +18,7 @@ A very handy League of Legends Discord Bot that monitors a list of summoners and
 > **Update 4/21/2021** <br>The embed now changes when the game finishes with the match duration and everyone's scores
 ![cmdline](https://i.imgur.com/oHTYONq.gif)
 
-> Now monitor's everybody's LP gains/loss
+> Now monitor's everybody's LP gains/loss<br>
 ![cmdline](https://i.imgur.com/9eOMPEv.png)
 
 # Instructions
