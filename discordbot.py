@@ -176,8 +176,14 @@ async def gamerCheck(name):
     global foundGames
     global watchedGames
 
-    summoner = getSummoner(name)
-    name = summoner["name"]
+    while(True):
+        try:
+            summoner = getSummoner(name)
+            name = summoner["name"]
+            break
+        except:
+            pass
+
     if (isPlaying(summoner["id"])):
         current = cass.get_current_match(summoner=name,region="NA")
         if current.id in foundGames:
@@ -224,8 +230,12 @@ for x in watchedSummoners:
 
 async def getLeagueRanks(summoner):
     # print("Pulling " + summoner + "'s rank ...")
-    summonerInfo = requests.get("https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/" + summoner + "?api_key=" + riotAPI).json()
-    summonerID = summonerInfo["id"]
+    try:
+        summonerInfo = requests.get("https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/" + summoner + "?api_key=" + riotAPI).json()
+        summonerID = summonerInfo["id"]
+    except:
+        return
+        pass
     req = requests.get("https://na1.api.riotgames.com/lol/league/v4/entries/by-summoner/"+ summonerID + "?api_key=" + riotAPI).json()
     try:
         for gamemode in req:
