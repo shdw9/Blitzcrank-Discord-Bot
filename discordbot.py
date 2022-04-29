@@ -1,12 +1,12 @@
 from re import L
 from discord.ext import commands
 from bs4 import BeautifulSoup
-import discord, cassiopeia as cass, datetime, asyncio, requests, json, roleidentification
+import discord, cassiopeia as cass, datetime, asyncio, requests, json, roleidentification, random
 from discord.ext.commands import CommandNotFound
 
 riotAPI = ""
 
-watchedSummoners = ['BLACKCAR','lrradical','IlIlIIllIllIllIl','Randomdude2468','ASOKO TENSEI','Amumu Main','Yasuo Meister','KRÂM','Motoaki Tanigo','Drch1cken','Burnt Toast741']
+watchedSummoners = ['BLACKCAR','lrradical','zero two stan','IlIlIIllIllIllIl','Randomdude2468','ASOKO TENSEI','Amumu Main','Yasuo Meister','KRÂM','Motoaki Tanigo','Drch1cken','Burnt Toast741']
 
 sendNotificationsChannelID = ""
 
@@ -16,14 +16,16 @@ latestVersion = requests.get("https://ddragon.leagueoflegends.com/realms/na.json
 championDatabase = requests.get("https://ddragon.leagueoflegends.com/cdn/" + latestVersion + "/data/en_US/championFull.json").json()
 
 bot = commands.Bot(command_prefix='!')
-cass.set_riot_api_key(riotAPI)
-
-foundGames = []
-watchedGames = []
 
 # retrieves summoner information based on summonerName
 def getSummoner(summoner):
-    return requests.get("https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/" + summoner + "?api_key=" + riotAPI).json()
+    while(True):
+        try:
+            summonerData = requests.get("https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/" + summoner + "?api_key=" + riotAPI).json()
+            name = summonerData["name"]
+            return summonerData
+        except:
+            pass
 
 # checks to see if there is an ONGOING game going with summoner name
 def isPlaying(summonerID):
@@ -52,7 +54,7 @@ def convert(seconds):
 
 @bot.event
 async def on_ready():
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="LEAGUE OF LEGENDS"))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Patch " + latestVersion))
     print('=> Logged in as {0.user}'.format(bot))
 
 async def background_task():
@@ -60,12 +62,12 @@ async def background_task():
 
     while(True):
         for summoner in watchedSummoners:
+            await gameCheck()
             await gamerCheck(summoner)
             await getLeagueRanks(summoner)
             await asyncio.sleep(30)
         await asyncio.sleep(120)
-        await gameCheck()
- 
+        
 # This command is lets you copy and paste the lobby joined messages 
 # and parses it into a na.op.gg link. All you have to do is copy and paste the link
 @bot.command()
@@ -94,6 +96,7 @@ async def multisearch(ctx,*,args):
     else:
         await ctx.reply("Sorry I can't comprehend what you're saying! :sweat_smile: ")
 
+cass.set_riot_api_key(riotAPI)
 # This command sends you the information of a champion's passive and abilities descriptions and cooldowns
 @bot.command()
 async def abilities(ctx, *, args):
@@ -121,13 +124,32 @@ async def abilities(ctx, *, args):
         pass
     await ctx.send(embed=embed)
 
+foundGames = []
+watchedGames = []
+
+# Checks if any watched games are finished
+# Also empties if the length of foundGames is greater than 10
 async def gameCheck():
+    global foundGames
     global watchedGames
+
+    cleanGames = False
+
+    winEmotes = ["https://i.imgur.com/ieWmRWb.png","https://i.imgur.com/batBGnC.png","https://i.imgur.com/LAyQgjj.png","https://i.imgur.com/qIchruZ.png","https://i.imgur.com/Q6nkk8B.png","https://i.imgur.com/EQQjHIY.png","https://i.imgur.com/ltYuPxd.png","https://i.imgur.com/goS2pMy.png","https://i.imgur.com/5yBfUAN.png"]
+    sadEmotes = ["https://i.imgur.com/q3u0c40.png","https://i.imgur.com/iurybFl.png","https://i.imgur.com/osGlgMV.png","https://i.imgur.com/RUKiZo7.png","https://i.imgur.com/u7eFXdk.png","https://i.imgur.com/fTptmUI.png","https://i.imgur.com/LyD9a3O.png"]
+
+    if (len(foundGames) >= 10):
+        cleanGames = True
+        print("Cleaning foundGames ...")
+        foundGames.clear()
 
     for game in watchedGames:
         matchID = game[0]
         summonerPUUID = game[1]
 
+        if (cleanGames):
+            foundGames.append(int(matchID))
+            
         matchResults = requests.get("https://americas.api.riotgames.com/lol/match/v5/matches/NA1_" + matchID + "?api_key=" + riotAPI)
         if (matchResults.status_code == 200):
             print("Match ID " + matchID + " has been finished")
@@ -140,14 +162,17 @@ async def gameCheck():
             summonerName = currentSummoner["name"]
             if (gameWon):
                 await embed.add_reaction("🇼")
-                newEmbed=discord.Embed(description="NA.OP.GG: [Link 🔗](https://na.op.gg/summoner/userName=" + summonerName.replace(" ","") +") | Mobalytics: [Link 🔗](https://app.mobalytics.gg/lol/profile/na/"+ summonerName.replace(" ","") +")\n\nMatch Duration: `"+ convert(gameDuration)+"`",timestamp=datetime.datetime.utcnow(), color=0x8BD3E6)
+                newEmbed=discord.Embed(description="NA.OP.GG: [Link 🔗](https://na.op.gg/summoner/userName=" + summonerName.replace(" ","") +") | Mobalytics: [Link 🔗](https://app.mobalytics.gg/lol/profile/na/"+ summonerName.replace(" ","") +")\n\nMatch Duration: `"+ convert(gameDuration)+"` [*](https://app.mobalytics.gg/lol/match/na/" + summonerName.replace(" ","") + "/" + matchID + ")",timestamp=datetime.datetime.utcnow(), color=0x8BD3E6)
+                emote = random.choice(winEmotes)
             else:
                 await embed.add_reaction("🇱")
-                newEmbed=discord.Embed(description="NA.OP.GG: [Link 🔗](https://na.op.gg/summoner/userName=" + summonerName.replace(" ","") +") | Mobalytics: [Link 🔗](https://app.mobalytics.gg/lol/profile/na/"+ summonerName.replace(" ","") +")\n\nMatch Duration: `"+ convert(gameDuration)+"`",timestamp=datetime.datetime.utcnow(), color=0xE7548C)
-            #await embed.edit(content="Match Duration: `" + convert(gameDuration) + "`")
+                newEmbed=discord.Embed(description="NA.OP.GG: [Link 🔗](https://na.op.gg/summoner/userName=" + summonerName.replace(" ","") +") | Mobalytics: [Link 🔗](https://app.mobalytics.gg/lol/profile/na/"+ summonerName.replace(" ","") +")\n\nMatch Duration: `"+ convert(gameDuration)+"` [*](https://app.mobalytics.gg/lol/match/na/" + summonerName.replace(" ","") + "/" + matchID + ")",timestamp=datetime.datetime.utcnow(), color=0xE7548C)
+                emote = random.choice(sadEmotes)
 
             blueteamcomp = ""
             redteamcomp = ""
+            blueTeamKills = 0
+            redTeamKills = 0
             queue = matchData["info"]["queueId"]
             for q in requests.get("https://static.developer.riotgames.com/docs/lol/queues.json").json():
                 if (queue == q["queueId"]):
@@ -156,33 +181,30 @@ async def gameCheck():
             count = 0
             for player in matchData["info"]["participants"]:
                 if count < 5:
-                    blueteamcomp += "\n" + player["championName"] + " - `" + player["summonerName"] + "` (" + str(player["kills"]) + "/" + str(player["deaths"]) + "/" + str(player["assists"]) + ")"
+                    blueteamcomp += "\n" + player["championName"] + " - `" + player["summonerName"].strip() + "` (" + str(player["kills"]) + "/" + str(player["deaths"]) + "/" + str(player["assists"]) + ")"
+                    blueTeamKills += player["kills"]
                 else:
-                    redteamcomp += "\n" + player["championName"] + " - `" + player["summonerName"] + "` (" + str(player["kills"]) + "/" + str(player["deaths"]) + "/" + str(player["assists"]) + ")"
+                    redteamcomp += "\n" + player["championName"] + " - `" + player["summonerName"].strip() + "` (" + str(player["kills"]) + "/" + str(player["deaths"]) + "/" + str(player["assists"]) + ")"
+                    redTeamKills += player["kills"]
                 count+=1
-
             
             newEmbed.set_author(name=summonerName + " Game Finished!",icon_url="https://ddragon.leagueoflegends.com/cdn/" + latestVersion + "/img/profileicon/" + str(currentSummoner["profileIconId"]) + ".png")
             newEmbed.set_footer(text="ID: " + matchID + " • powered by shdw 👻",icon_url="https://i.imgur.com/ri6NrsN.png")
             newEmbed.add_field(name="Gamemode",value=queueType.replace("games",""),inline = False)
-            newEmbed.add_field(name="Blue Team",value=blueteamcomp, inline=True)
-            newEmbed.add_field(name="Red Team",value=redteamcomp, inline=True)
+            newEmbed.add_field(name="Blue Team (" + str(blueTeamKills) + " kills)",value=blueteamcomp, inline=True)
+            newEmbed.add_field(name="Red Team (" + str(redTeamKills) + " kills)",value=redteamcomp, inline=True)
+            newEmbed.set_image(url=emote)
             await embed.edit(embed=newEmbed)
             watchedGames.remove(game)
 
-
+# Checks if a summoner is currently in game (does not work for TFT)
 champion_roles = roleidentification.pull_data()
 async def gamerCheck(name):
     global foundGames
     global watchedGames
 
-    while(True):
-        try:
-            summoner = getSummoner(name)
-            name = summoner["name"]
-            break
-        except:
-            pass
+    summoner = getSummoner(name)
+    name = summoner["name"]
 
     if (isPlaying(summoner["id"])):
         current = cass.get_current_match(summoner=name,region="NA")
@@ -213,7 +235,7 @@ async def gamerCheck(name):
             redteamcomp += "\n" + championDatabase["keys"][str(redteamroles[x])] + " - `" + redSummoners[redteamroles[x]].strip() + "`"
 
         embed=discord.Embed(description="NA.OP.GG: [Link 🔗](https://na.op.gg/summoner/userName=" + name.replace(" ","") +") | Mobalytics: [Link 🔗](https://app.mobalytics.gg/lol/profile/na/"+ name.replace(" ","") +")",timestamp=datetime.datetime.utcnow(), color=0x62C979)
-        embed.set_author(name=name + " Game Found!",icon_url="https://ddragon.leagueoflegends.com/cdn/" + latestVersion + "/img/profileicon/" + str(summoner["profileIconId"]) + ".png")
+        embed.set_author(name=name + "'s Game Found!",icon_url="https://ddragon.leagueoflegends.com/cdn/" + latestVersion + "/img/profileicon/" + str(summoner["profileIconId"]) + ".png")
         embed.set_footer(text="ID: " + str(current.id) + " • powered by shdw 👻",icon_url="https://i.imgur.com/ri6NrsN.png")
         embed.add_field(name="Gamemode",value=matchQueue,inline = False)
         embed.add_field(name="Blue Team",value=blueteamcomp, inline=True)
@@ -222,6 +244,7 @@ async def gamerCheck(name):
 
         # if successfully sent, add to foundGames, and watchedGames
         foundGames.append(current.id)
+        print("Now watching Match ID " + str(current.id) + " for " + name)
         watchedGames.append([str(current.id),summoner["puuid"],sentEmbed])
     
 leaguePointsBook = {}
@@ -229,13 +252,9 @@ for x in watchedSummoners:
     leaguePointsBook[x] = {}
 
 async def getLeagueRanks(summoner):
-    # print("Pulling " + summoner + "'s rank ...")
-    try:
-        summonerInfo = requests.get("https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/" + summoner + "?api_key=" + riotAPI).json()
-        summonerID = summonerInfo["id"]
-    except:
-        return
-        pass
+    summonerInfo = getSummoner(summoner)
+    summonerID = summonerInfo["id"]
+
     req = requests.get("https://na1.api.riotgames.com/lol/league/v4/entries/by-summoner/"+ summonerID + "?api_key=" + riotAPI).json()
     try:
         for gamemode in req:
@@ -249,30 +268,29 @@ async def getLeagueRanks(summoner):
                     print(summoner + " gained " + str(leaguePoints-leaguePointsBook[summoner][queue]["leaguePoints"]) + " LP in " + queue)
 
                     embed=discord.Embed(description="**+" + str(leaguePoints-leaguePointsBook[summoner][queue]["leaguePoints"]) + "** LP in " + queue.replace("_"," "),timestamp=datetime.datetime.utcnow(), color=0x62C979)
-                    embed.set_author(name="🚨 " + summoner + " UPDATE 🚨",icon_url="https://ddragon.leagueoflegends.com/cdn/" + latestVersion + "/img/profileicon/" + str(summonerInfo["profileIconId"]) + ".png")
+                    embed.set_author(name="🚨 " + summoner.upper() + " UPDATE 🚨",icon_url="https://ddragon.leagueoflegends.com/cdn/" + latestVersion + "/img/profileicon/" + str(summonerInfo["profileIconId"]) + ".png")
                     embed.add_field(name=queue.replace("_"," "),value=tier + " " + rank + " - " + str(leaguePoints) + " LP")
-                    embed.set_footer(text="powered by shdw 👻",icon_url="https://i.imgur.com/ri6NrsN.png")
+                    embed.set_footer(text="powered by shdw 👻",icon_url="https://i.imgur.com/0m1B3Et.png")
                     embed.set_thumbnail(url="https://i.imgur.com/Hfvor2h.png")
                     await bot.get_channel(int(sendNotificationsChannelID)).send(embed=embed)
                 elif leaguePointsBook[summoner][queue]["leaguePoints"] > leaguePoints:
                     print(summoner + " lost " + str(leaguePointsBook[summoner][queue]["leaguePoints"]-leaguePoints) + " LP in " + queue)
 
                     embed=discord.Embed(description="*-" + str(leaguePointsBook[summoner][queue]["leaguePoints"]-leaguePoints) + "* LP in " + queue.replace("_"," "),timestamp=datetime.datetime.utcnow(), color=0xE7548C)
-                    embed.set_author(name="🚨 " + summoner + " UPDATE 🚨",icon_url="https://ddragon.leagueoflegends.com/cdn/" + latestVersion + "/img/profileicon/" + str(summonerInfo["profileIconId"]) + ".png")
+                    embed.set_author(name="🚨 " + summoner.upper() + " UPDATE 🚨",icon_url="https://ddragon.leagueoflegends.com/cdn/" + latestVersion + "/img/profileicon/" + str(summonerInfo["profileIconId"]) + ".png")
                     embed.add_field(name=queue.replace("_"," "),value=tier + " " + rank + " - " + str(leaguePoints) + " LP")
                     embed.set_footer(text="powered by shdw 👻",icon_url="https://i.imgur.com/ri6NrsN.png")
-                    embed.set_thumbnail(url="https://i.imgur.com/gT929Bg.png")
+                    embed.set_thumbnail(url="https://i.imgur.com/bTORHF3.png")
                     await bot.get_channel(int(sendNotificationsChannelID)).send(embed=embed)
-            except Exception as e:
-                #print(e)
+            except:
                 pass
 
             # update dictionary
             leaguePointsBook[summoner][queue] = {"leaguePoints":leaguePoints,"rank":tier + " " + rank}
     except:
         pass
-    #print(leaguePointsBook)
 
+# red side jungle tips for a given champion
 @bot.command()
 async def red(ctx,*,args):
     r = requests.get("https://jungler.gg/champions/" + args)
@@ -306,7 +324,8 @@ async def red(ctx,*,args):
 
     await ctx.send(embed=redSideProEmbed)
     await ctx.send(embed=redSideNoobEmbed)
-
+ 
+# blue side jungle tips for a given champion
 @bot.command()
 async def blue(ctx,*,args):
     r = requests.get("https://jungler.gg/champions/" + args)
@@ -348,5 +367,5 @@ async def on_command_error(ctx, error):
     raise error
     
 bot.loop.create_task(background_task())
-
+print("[LEAGUE BOT] Using information from Patch " + latestVersion)
 bot.run('')
