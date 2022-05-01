@@ -6,7 +6,7 @@ from discord.ext.commands import CommandNotFound
 
 riotAPI = ""
 
-watchedSummoners = ['BLACKCAR','lrradical','zero two stan','IlIlIIllIllIllIl','Randomdude2468','ASOKO TENSEI','Amumu Main','Yasuo Meister','KRÂM','Motoaki Tanigo','Drch1cken','Burnt Toast741']
+watchedSummoners = ['BLACKCAR','lrradical','zero two stan','IlIlIIllIllIllIl','Randomdude2468','ASOKO TENSEI','Amumu Main','Yasuo Meister','KRÂM','Motoaki Tanigo','Drch1cken','Burnt Toast741','DSharqman','SAT Essay']
 
 sendNotificationsChannelID = ""
 
@@ -52,10 +52,13 @@ def convert(seconds):
       
     return "%02dm %02ds" % (minutes, seconds)
 
+
 @bot.event
 async def on_ready():
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Patch " + latestVersion))
     print('=> Logged in as {0.user}'.format(bot))
+
+checkCooldown = int(len(watchedSummoners)/0.4)
 
 async def background_task():
     await bot.wait_until_ready()
@@ -65,7 +68,7 @@ async def background_task():
             await gameCheck()
             await gamerCheck(summoner)
             await getLeagueRanks(summoner)
-            await asyncio.sleep(30)
+            await asyncio.sleep(checkCooldown)
         await asyncio.sleep(120)
         
 # This command is lets you copy and paste the lobby joined messages 
@@ -160,6 +163,7 @@ async def gameCheck():
             embed = game[2]
             currentSummoner = requests.get("https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/"+ summonerPUUID + "?api_key=" + riotAPI).json()
             summonerName = currentSummoner["name"]
+            await getLeagueRanks(summonerName)
             if (gameWon):
                 await embed.add_reaction("🇼")
                 newEmbed=discord.Embed(description="NA.OP.GG: [Link 🔗](https://na.op.gg/summoner/userName=" + summonerName.replace(" ","") +") | Mobalytics: [Link 🔗](https://app.mobalytics.gg/lol/profile/na/"+ summonerName.replace(" ","") +")\n\nMatch Duration: `"+ convert(gameDuration)+"` [*](https://app.mobalytics.gg/lol/match/na/" + summonerName.replace(" ","") + "/" + matchID + ")",timestamp=datetime.datetime.utcnow(), color=0x8BD3E6)
@@ -256,6 +260,7 @@ async def getLeagueRanks(summoner):
     summonerID = summonerInfo["id"]
 
     req = requests.get("https://na1.api.riotgames.com/lol/league/v4/entries/by-summoner/"+ summonerID + "?api_key=" + riotAPI).json()
+    #print("Checking ranks ...")
     try:
         for gamemode in req:
             queue = gamemode["queueType"]
@@ -264,11 +269,19 @@ async def getLeagueRanks(summoner):
             leaguePoints = gamemode["leaguePoints"]
 
             try:
-                if leaguePointsBook[summoner][queue]["leaguePoints"] < leaguePoints:
+                if leaguePointsBook[summoner][queue]["rank"] != tier + " " + rank:
+                    print(summoner + " rank changed from " + leaguePointsBook[summoner][queue][rank] + " to " + tier + " " + rank + "!")
+
+                    embed=discord.Embed(description=leaguePointsBook[summoner][queue][rank] + " **->** " + tier + " " + rank,timestamp=datetime.datetime.utcnow(), color=0xff00ff)
+                    embed.set_author(name="🚨 " + summoner.upper() + " RANK UPDATE 🚨",icon_url="https://ddragon.leagueoflegends.com/cdn/" + latestVersion + "/img/profileicon/" + str(summonerInfo["profileIconId"]) + ".png")
+                    embed.add_field(name=queue.replace("_"," "),value=tier + " " + rank)
+                    embed.set_footer(text="powered by shdw 👻",icon_url="https://i.imgur.com/0m1B3Et.png")
+                    await bot.get_channel(int(sendNotificationsChannelID)).send(embed=embed)
+                elif leaguePointsBook[summoner][queue]["leaguePoints"] < leaguePoints:
                     print(summoner + " gained " + str(leaguePoints-leaguePointsBook[summoner][queue]["leaguePoints"]) + " LP in " + queue)
 
                     embed=discord.Embed(description="**+" + str(leaguePoints-leaguePointsBook[summoner][queue]["leaguePoints"]) + "** LP in " + queue.replace("_"," "),timestamp=datetime.datetime.utcnow(), color=0x62C979)
-                    embed.set_author(name="🚨 " + summoner.upper() + " UPDATE 🚨",icon_url="https://ddragon.leagueoflegends.com/cdn/" + latestVersion + "/img/profileicon/" + str(summonerInfo["profileIconId"]) + ".png")
+                    embed.set_author(name="🚨 " + summoner.upper() + " LP UPDATE 🚨",icon_url="https://ddragon.leagueoflegends.com/cdn/" + latestVersion + "/img/profileicon/" + str(summonerInfo["profileIconId"]) + ".png")
                     embed.add_field(name=queue.replace("_"," "),value=tier + " " + rank + " - " + str(leaguePoints) + " LP")
                     embed.set_footer(text="powered by shdw 👻",icon_url="https://i.imgur.com/0m1B3Et.png")
                     embed.set_thumbnail(url="https://i.imgur.com/Hfvor2h.png")
@@ -277,18 +290,20 @@ async def getLeagueRanks(summoner):
                     print(summoner + " lost " + str(leaguePointsBook[summoner][queue]["leaguePoints"]-leaguePoints) + " LP in " + queue)
 
                     embed=discord.Embed(description="*-" + str(leaguePointsBook[summoner][queue]["leaguePoints"]-leaguePoints) + "* LP in " + queue.replace("_"," "),timestamp=datetime.datetime.utcnow(), color=0xE7548C)
-                    embed.set_author(name="🚨 " + summoner.upper() + " UPDATE 🚨",icon_url="https://ddragon.leagueoflegends.com/cdn/" + latestVersion + "/img/profileicon/" + str(summonerInfo["profileIconId"]) + ".png")
+                    embed.set_author(name="🚨 " + summoner.upper() + " LP UPDATE 🚨",icon_url="https://ddragon.leagueoflegends.com/cdn/" + latestVersion + "/img/profileicon/" + str(summonerInfo["profileIconId"]) + ".png")
                     embed.add_field(name=queue.replace("_"," "),value=tier + " " + rank + " - " + str(leaguePoints) + " LP")
                     embed.set_footer(text="powered by shdw 👻",icon_url="https://i.imgur.com/ri6NrsN.png")
                     embed.set_thumbnail(url="https://i.imgur.com/bTORHF3.png")
                     await bot.get_channel(int(sendNotificationsChannelID)).send(embed=embed)
-            except:
+            except Exception as e:
                 pass
 
             # update dictionary
             leaguePointsBook[summoner][queue] = {"leaguePoints":leaguePoints,"rank":tier + " " + rank}
-    except:
+    except Exception as e:
+        #print(e)
         pass
+    #print("Done checking ranks")
 
 # red side jungle tips for a given champion
 @bot.command()
@@ -360,6 +375,21 @@ async def blue(ctx,*,args):
     await ctx.send(embed=blueSideProEmbed)
     await ctx.send(embed=blueSideNoobEmbed)
     
+@bot.command()
+async def mmr(ctx, *, args):
+    try:
+        summonerInfo = getSummoner(args)
+        r = requests.get("https://na.whatismymmr.com/api/v1/summoner?name=" + args).json()
+        embed=discord.Embed(description="Here is your MMR for the following modes",timestamp=datetime.datetime.utcnow(), color=0xAC4FC6)
+        embed.set_author(name="🪙 " + args.upper() + "'s MMR 🪙",icon_url="https://ddragon.leagueoflegends.com/cdn/" + latestVersion + "/img/profileicon/" + str(summonerInfo["profileIconId"]) + ".png")
+        embed.add_field(name="Ranked",value=str(r["ranked"]["closestRank"]))
+        embed.add_field(name="Normal",value=str(r["normal"]["closestRank"]))
+        embed.add_field(name="ARAM",value=str(r["ARAM"]["closestRank"]))
+        embed.set_footer(text="from whatismymmr.com",icon_url="https://i.imgur.com/ri6NrsN.png")
+        await ctx.reply(embed=embed)
+    except:
+        await ctx.reply("We don't have enough data for that summoner!")
+
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, CommandNotFound):
