@@ -223,20 +223,28 @@ async def gamerCheck(name):
         for x in current.blue_team.participants:
             blueSummoners[x.champion.id] = x.summoner.name
             blueteam.append(x.champion.id)
-        blueteamroles = roleidentification.get_roles(champion_roles,blueteam)
         blueteamcomp = ""
-        for x in blueteamroles:
-            blueteamcomp += "\n" + championDatabase["keys"][str(blueteamroles[x])] + " - `" + blueSummoners[blueteamroles[x]].strip() + "`"
+        try:
+            blueteamroles = roleidentification.get_roles(champion_roles,blueteam)
+            for x in blueteamroles:
+                blueteamcomp += "\n" + championDatabase["keys"][str(blueteamroles[x])] + " - `" + blueSummoners[blueteamroles[x]].strip() + "`"
+        except:
+            for x in blueSummoners:
+                blueteamcomp += "\n" + championDatabase["keys"][x] + " - `" + blueSummoners[x].strip() + "`"
 
         redteam = []
         redSummoners = {}
         for x in current.red_team.participants:
             redSummoners[x.champion.id] = x.summoner.name
             redteam.append(x.champion.id)
-        redteamroles = roleidentification.get_roles(champion_roles,redteam)
         redteamcomp = ""
-        for x in redteamroles:
-            redteamcomp += "\n" + championDatabase["keys"][str(redteamroles[x])] + " - `" + redSummoners[redteamroles[x]].strip() + "`"
+        try:
+            redteamroles = roleidentification.get_roles(champion_roles,redteam)
+            for x in redteamroles:
+                redteamcomp += "\n" + championDatabase["keys"][str(redteamroles[x])] + " - `" + redSummoners[redteamroles[x]].strip() + "`"
+        except:
+            for x in redSummoners:
+                redteamcomp += "\n" + championDatabase["keys"][x] + " - `" + redSummoners[x].strip() + "`"
 
         embed=discord.Embed(description="NA.OP.GG: [Link 🔗](https://na.op.gg/summoner/userName=" + name.replace(" ","") +") | Mobalytics: [Link 🔗](https://app.mobalytics.gg/lol/profile/na/"+ name.replace(" ","") +")",timestamp=datetime.datetime.utcnow(), color=0x62C979)
         embed.set_author(name=name + "'s Game Found!",icon_url="https://ddragon.leagueoflegends.com/cdn/" + latestVersion + "/img/profileicon/" + str(summoner["profileIconId"]) + ".png")
