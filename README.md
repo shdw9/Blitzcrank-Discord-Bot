@@ -1,4 +1,4 @@
-# shdwbot (League of Legends tool)
+# Blitzcrank Discord Bot
 A very handy League of Legends Discord Bot that monitors a list of summoners and more (WIP)
 
 # Features
