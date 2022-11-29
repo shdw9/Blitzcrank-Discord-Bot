@@ -20,4 +20,4 @@ idscraper.py - used to pull emoji id's from discord servers that the bot is invi
 4) mass upload each folder of icons into each emoji discord server
 5) invite the discord bot into all of the discord servers
 6) run idscraper.py to get all the emoji id's for all the emojis
-7) copy and paste all the emojis and id
+7) copy and paste the link from idscraper.py into blitzcrank bot
