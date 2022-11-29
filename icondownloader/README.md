@@ -2,7 +2,7 @@
 
 this is the setup to let blitzcrank bot use emojis for champion icons
 
-<br>![](https://i.imgur.com/pYtGSAT.png)
+<br>![](https://i.imgur.com/NEWuB4f.png)
 
 # icon downloader
 
