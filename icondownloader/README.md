@@ -6,6 +6,8 @@ this is the setup to let blitzcrank bot use emojis for champion icons
 
 # icon downloader
 
+files: 
+
 > scraper.py - used to download all league of legends champion icons, will create multiple folders of 50 icons
 
 > idscraper.py - used to pull emoji id's from discord servers that the bot is invited in
