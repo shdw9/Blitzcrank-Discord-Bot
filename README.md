@@ -7,6 +7,9 @@ a League of Legends Discord bot that monitors specified players and tracks of th
 - Automatically edits the embed when the game finishes with the match duration and the KDA scoreboard
 - Monitors the summoners' LP loss and gains
 
+> Optional Emojis to replace Champion Names!<br>
+![cmdline](https://i.imgur.com/QS3hOMc.png)
+
 > When that summoner is found in a game, it will send a Discord embed to a specified Discord channel.
 > <br>Eventually, when the game finishes, it will react with a W or an L (depending on the summoner's side)
 ![cmdline](https://i.imgur.com/2xsBbGJ.png)
