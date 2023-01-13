@@ -1,10 +1,8 @@
-# emojis for league bot
+# icon downloader - emojis for Blitzcrank
 
-this is the setup to let blitzcrank bot use emojis for champion icons
+Instructions down below to get emojis in Blitzcrank bot (shown below)
 
 <br>![](https://i.imgur.com/NEWuB4f.png)
-
-# icon downloader
 
 files: 
 
