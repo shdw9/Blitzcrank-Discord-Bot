@@ -1,17 +1,11 @@
 # Blitzcrank Discord Bot
-A very handy League of Legends Discord Bot that monitors a list of summoners and more (WIP)
+a League of Legends Discord bot that monitors specified players and tracks of their live games and ranked progress.
 
 # Features
 
-- Monitors a list of summoners and sends an embed when they join a game
+- Monitors a list of summoners and sends a Discord embed when they join a game / finish a game
 - Automatically edits the embed when the game finishes with the match duration and the KDA scoreboard
 - Monitors the summoners' LP loss and gains
-
-- **Jungler.gg Integration**
-<br> !blue (jungleChampion) would return recommended tips for blue side for that jungle champion
-<br> !red (jungleChampion) would return recommended tips for red side for that jungle champion
-- **NA.OP.GG Multisearch Integration**
-<br> When you join a lobby, copy and paste the joined messages so that it returns you with a clickable NA.OP.GG multisearch link
 
 > When that summoner is found in a game, it will send a Discord embed to a specified Discord channel.
 > <br>Eventually, when the game finishes, it will react with a W or an L (depending on the summoner's side)
@@ -26,17 +20,14 @@ A very handy League of Legends Discord Bot that monitors a list of summoners and
 > Now monitor's everybody's LP gains/loss<br>
 ![cmdline](https://i.imgur.com/9eOMPEv.png)
 
-> Jungler.gg integration (!blue (jgChamp) or !red (jgChamp))<br>
-![cmdline](https://i.imgur.com/o3GjRbG.png)
-
 # Instructions
 
 - Install the required libraries, one of them is https://github.com/meraki-analytics/role-identification
-- Edit the first few lines to put in the list of summoners and your Riot API key.
-- Edit the last line to add in your Discord Bot token
+- Edit the lines under BOT SETTINGS in the discordbot.py
 - Run the .py
 
 # Requirements
 
 - Python
 - Riot API Key (obtained from Riot Developer Portal)
+- Discord Bot Token with INTENTS ENABLED
