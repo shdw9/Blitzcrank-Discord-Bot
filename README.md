@@ -29,6 +29,8 @@ a League of Legends Discord bot that monitors specified players and tracks of th
 - Edit the lines under BOT SETTINGS in the discordbot.py
 - Run the .py
 
+To enable emoji support, follow instructions in /icondownloader in this repo
+
 # Requirements
 
 - Python
