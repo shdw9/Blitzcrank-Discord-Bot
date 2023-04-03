@@ -321,27 +321,16 @@ async def on_message(message):
     if message.author.bot:
         return
     searchQuery = "https://na.op.gg/multisearch/na?summoners="
-    if "joined the lobby" in str(message.content):
-        for line in message.content.split("\n"):
-            name = line.split(" joined")[0].replace(" ","+")
-            searchQuery += name + "%2C"
-        await message.channel.send(searchQuery[:len(searchQuery)-3],reference=message)
-        try:
-            await message.delete()
-        except:
-            pass
-    elif "님이 로비에 참가하셨습니다" in str(message.content):
-        for line in message.content.split("\n"):
-            name = line.split(" 님이")[0].replace(" ","+")
-            searchQuery += name + "%2C"
-        await message.channel.send(searchQuery[:len(searchQuery)-3],reference=message)
-        try:
-            await message.delete()
-        except:
-            pass
-    elif "がロビーに参加しました" in str(message.content):
-        for line in message.content.split("\n"):
-            name = line.split("がロビーに参加しました")[0].strip().replace(" ","+")
+    msg_content = str(message.content)
+    if "joined the lobby" in str(msg_content):
+        sep = " joined"
+    elif "님이 로비에 참가하셨습니다" in str(msg_content):
+        sep = " 님이"
+    elif "がロビーに参加しました" in str(msg_content):
+        sep = "がロビーに参加しました"
+    if sep:
+        for line in msg_content.split("\n"):
+            name = line.split(sep)[0].replace(" ","+")
             searchQuery += name + "%2C"
         await message.channel.send(searchQuery[:len(searchQuery)-3],reference=message)
         try:
