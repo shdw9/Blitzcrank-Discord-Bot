@@ -808,7 +808,7 @@ async def isPlayerPlaying(summoner):
                 rank = await getHighestRank(blueParticipants.summoner.name)
             except:
                 pass
-            blueTeam[blueParticipants.summoner.name] = {"role":"","champ":championDatabase["keys"][str(blueParticipants.champion.id)],"champId": blueParticipants.champion.id,"rank":rank}
+            blueTeam[blueParticipants.summoner.name.strip()] = {"role":"","champ":championDatabase["keys"][str(blueParticipants.champion.id)],"champId": blueParticipants.champion.id,"rank":rank}
             blueChampions.append(blueParticipants.champion.id)
 
         blueOrganized = roleidentification.get_roles(champion_roles, blueChampions) # returns {'TOP': 122, 'JUNGLE': 64, 'MIDDLE': 69, 'BOTTOM': 119, 'UTILITY': 201}
@@ -829,7 +829,7 @@ async def isPlayerPlaying(summoner):
                 rank = await getHighestRank(redParticipants.summoner.name)
             except:
                 pass
-            redTeam[redParticipants.summoner.name] = {"role":"","champ":championDatabase["keys"][str(redParticipants.champion.id)],"champId": redParticipants.champion.id,"rank":rank}
+            redTeam[redParticipants.summoner.name.strip()] = {"role":"","champ":championDatabase["keys"][str(redParticipants.champion.id)],"champId": redParticipants.champion.id,"rank":rank}
             redChampions.append(redParticipants.champion.id)
 
         redOrganized = roleidentification.get_roles(champion_roles, redChampions) # returns {'TOP': 122, 'JUNGLE': 64, 'MIDDLE': 69, 'BOTTOM': 119, 'UTILITY': 201}
