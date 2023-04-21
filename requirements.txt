@@ -1,0 +1,8 @@
+beautifulsoup4
+py-cord
+cassiopeia
+datetime
+asyncio
+random
+traceback
+git+https://github.com/meraki-analytics/role-identification.git
