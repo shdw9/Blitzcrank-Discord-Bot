@@ -1,4 +1,6 @@
-# icon downloader - emojis for Blitzcrank
+# ARCHIVED, THIS IS NO LONGER NEEDED
+
+## icon downloader - emojis for Blitzcrank
 
 Instructions down below to get emojis in Blitzcrank bot (shown below)
 
@@ -10,7 +12,7 @@ files:
 
 > idscraper.py - used to pull emoji id's from discord servers that the bot is invited in
 
-# instructions
+## instructions
 
 1) use your league discord bot token and save it for later
 2) run scraper.py to download all the current champion icons - this will create X amount of folders.
